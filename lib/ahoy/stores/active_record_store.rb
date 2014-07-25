@@ -3,13 +3,15 @@ module Ahoy
     class ActiveRecordStore < BaseStore
 
       def track_visit(options, &block)
-        visit =
-          visit_model.new do |v|
-            v.id = ahoy.visit_id
-            v.visitor_id = ahoy.visitor_id
-            v.user = user if v.respond_to?(:user=)
-            v.started_at = options[:started_at]
-          end
+        visit = visit_model.new(
+          {
+            id: ahoy.visit_id,
+            visitor_id: ahoy.visitor_id,
+            user: user,
+            started_at: options[:started_at]
+          },
+          :without_protection => true
+        )
 
         visit_properties.keys.each do |key|
           visit.send(:"#{key}=", visit_properties[key]) if visit.respond_to?(:"#{key}=")
